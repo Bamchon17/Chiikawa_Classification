@@ -47,6 +47,46 @@ The API is built with **FastAPI**, leveraging **multiprocessing** to efficiently
 
 ---
 
+## 🗂 Git LFS Setup (สำหรับ Dataset)
+
+โปรเจกต์นี้ใช้ **Git LFS (Large File Storage)** สำหรับจัดการไฟล์รูปภาพใน `dataset/` เพื่อนที่ clone ไปต้องติดตั้ง Git LFS ก่อน ไม่งั้นจะได้แค่ pointer file แทนรูปจริง
+
+### ติดตั้ง Git LFS
+
+**Windows (แนะนำ):**
+```bash
+# ดาวน์โหลดจาก https://git-lfs.com/ แล้วติดตั้ง
+# หรือใช้ winget
+winget install GitHub.GitLFS
+```
+
+**Mac:**
+```bash
+brew install git-lfs
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt install git-lfs
+```
+
+### ใช้งาน Git LFS
+
+```bash
+# 1. เปิดใช้งาน LFS ใน machine (ทำครั้งเดียว)
+git lfs install
+
+# 2. Clone โปรเจกต์ตามปกติ (LFS จะ download รูปให้อัตโนมัติ)
+git clone <repo-url>
+
+# 3. ถ้า clone ไปแล้วแต่รูปยังไม่โหลด ให้รัน
+git lfs pull
+```
+
+> **หมายเหตุ:** ไฟล์ที่ track ด้วย LFS ได้แก่ `.png`, `.jpg`, `.jpeg`, `.webp`
+
+---
+
 ## 📁 Directory Structure (Proposed)
 ```text
 .

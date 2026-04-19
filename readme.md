@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="assets/images/ChiikawaBanner.jpeg" width="100%" alt="Project Banner">
+</p>
+
+
+
 # 🐹 Chiikawa Image Classification Service (MLOps Challenge)
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)

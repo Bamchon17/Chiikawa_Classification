@@ -14,10 +14,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 
-
 # จัดการ Path ใช้ Environment Variables + pathlib
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 MODEL_PATH = os.getenv("MODEL_PATH", str(BASE_DIR / "models" / "mobilenetv3_quant.onnx"))
 LABELS_PATH = os.getenv("LABELS_PATH", str(BASE_DIR / "models" / "labels.json"))
@@ -30,13 +29,8 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# 1. เชื่อมต่อโฟลเดอร์ static เพื่อให้เข้าถึงไฟล์ css/js ได้
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
-# 2. สร้าง Route สำหรับหน้าแรก (Frontend)
-@app.get("/")
-async def read_index():
-    return FileResponse("src/static/index.html")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # --- ส่วนจัดการ Traffic  ---
 # จำกัดให้ CPU Bound ได้พร้อมกันแค่ 4 งาน ใครที่มาเกินกว่านี้จะ Wait in Queue แทนการโดนไล่
@@ -77,9 +71,10 @@ def AI_inference_worker(image_bytes: bytes):
 def log_model_processing(filename: str):
     print(f"กำลังส่งไฟล์ {filename} เข้าสู่กระบวนการรันโมเดลใน Background...")
 
-@app.get("/", tags=['Health Check'])
-async def root():
-    return {"status": "online", "message": "Chiikawa API is ready!"}
+# สร้าง Route สำหรับหน้าแรก (Frontend)
+@app.get("/")
+async def read_index():
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 @app.post("/predict", response_model=PredictionResponse, tags=["MLOps"])
 async def predict(file: UploadFile= File(...), 

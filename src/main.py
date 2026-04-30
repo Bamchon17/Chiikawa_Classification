@@ -1,5 +1,7 @@
 import io
+import os
 import asyncio
+from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, HTTPException, status, BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
@@ -7,6 +9,20 @@ from PIL import Image
 from typing import Dict
 import random, time
 from concurrent.futures import ProcessPoolExecutor
+from ai_engine import ChiikawaModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+
+
+# จัดการ Path ใช้ Environment Variables + pathlib
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MODEL_PATH = os.getenv("MODEL_PATH", str(BASE_DIR / "models" / "mobilenetv3_quant.onnx"))
+LABELS_PATH = os.getenv("LABELS_PATH", str(BASE_DIR / "models" / "labels.json"))
+THRESHOLD = float(os.getenv("MODEL_THRESHOLD", 0.7))
+
 
 app = FastAPI(
     title="Chiikawa Classification Service",
@@ -14,12 +30,21 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# 1. เชื่อมต่อโฟลเดอร์ static เพื่อให้เข้าถึงไฟล์ css/js ได้
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+# 2. สร้าง Route สำหรับหน้าแรก (Frontend)
+@app.get("/")
+async def read_index():
+    return FileResponse("src/static/index.html")
 
 # --- ส่วนจัดการ Traffic  ---
 # จำกัดให้ CPU Bound ได้พร้อมกันแค่ 4 งาน ใครที่มาเกินกว่านี้จะ Wait in Queue แทนการโดนไล่
 service_lock = asyncio.Semaphore(4)
-# กำหนด max_workers 
 executor = ProcessPoolExecutor(max_workers=4)
+
+# ตัวแปรสำหรับเก็บโมเดลในแต่ละ Process 
+engine = None
 
 class PredictionResponse(BaseModel):
     filename: str
@@ -27,12 +52,26 @@ class PredictionResponse(BaseModel):
     confidence: float
     message: str
 
-# ส่วนการประมวลผลโมเดล AI Classification (รอคิว + ขอลองทดสอบเองก่อน)
+# ส่วนการประมวลผลโมเดล AI Classification 
 def AI_inference_worker(image_bytes: bytes):
-    time.sleep(2.5) # จำลองโหลดหนัก
-    characters = ["Chiikawa", "Hachiware", "Usagi"] 
-    return random.choice(characters), random.uniform(0.85, 0.99)
-# model = load_model("") รอใส่โมเดล ย่อส่วนของคิว onnx
+    """
+    ฟังก์ชันคนงานที่จะถูกรันใน Process แยกต่างหาก 
+    """
+    global engine
+    if engine is None:
+        # เช็คก่อนว่าไฟล์โมเดลมีอยู่จริงไหม (ข้อดีของ pathlib object)
+        m_path = Path(MODEL_PATH)
+        if not m_path.exists():
+            raise FileNotFoundError(f"หาไฟล์โมเดลไม่เจอที่: {m_path}")
+            
+        engine = ChiikawaModel(
+            model_path=str(m_path), 
+            labels_path=LABELS_PATH,
+            threshold=THRESHOLD
+        )
+    label, score = engine.predict(image_bytes)
+    return label, score
+
 
 # Background Task
 def log_model_processing(filename: str):
@@ -80,7 +119,6 @@ async def predict(file: UploadFile= File(...),
         )
 
     # --- Step 3: จัดการลำดับคิวและแสดงข้อความบอก User ---
-    # เช็คสถานะคิวล่าสุด จะได้จัดการรอของUser
     if service_lock.locked():
         current_message = "ขณะนี้มีผู้ใช้งานจำนวนมาก ไฟล์ของคุณถูกเข้าคิวไว้แล้ว กรุณารอสักครู่..."
     else:
@@ -88,7 +126,6 @@ async def predict(file: UploadFile= File(...),
 
     async with service_lock:
         # 3.1 ตรวจสอบไส้ในไฟล์ กันการแปลงนามสกุลไฟล์หลอกๆหรือส่งไวรัสมา  CPU Bound
-        #สร้างฟังก์ชันเช็คความสมบูรณ์ของรูป (คนงาน)
         def verify_image(image_content):
             try:
                 # ใช้ ฺ BytesIO เพื่อให้ PILLOW อ่านจาก Memory โดยตรง

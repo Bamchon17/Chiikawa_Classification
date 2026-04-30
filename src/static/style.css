@@ -1,0 +1,51 @@
+:root {
+    --primary-green: #82CD47;
+    --hover-green: #54B435;
+    --card-bg: #F9F8F1;
+    --accent-pink: #FF9AA2;
+    --accent-yellow: #FFDAC1;
+    --text-main: #444444;
+}
+
+body {
+    background-image: url('/static/bg-garden.jpg'); /* ใส่รูปสวนในพื้นหลัง */
+    background-size: cover;
+    font-family: 'Kanit', sans-serif;
+    color: var(--text-main);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 3px dashed #D1D1D1;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.btn-primary {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-green);
+    transform: scale(1.05);
+}
+
+.progress-bg {
+    background: #E5E5E5;
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: var(--primary-green);
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+}

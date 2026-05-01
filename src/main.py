@@ -9,20 +9,21 @@ from PIL import Image
 from typing import Dict
 import random, time
 from concurrent.futures import ProcessPoolExecutor
-from ai_engine import ChiikawaModel
+from .ai_engine import ChiikawaModel
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 
+# จัดการ Path ให้ฉลาดขึ้น รองรับทั้งตอนรันสดและใน Docker
+BASE_DIR = Path(__file__).resolve().parent  
+ROOT_DIR = BASE_DIR.parent               
+STATIC_DIR = BASE_DIR / "static"          
+MODELS_DIR = ROOT_DIR / "models"          
 
-# จัดการ Path ใช้ Environment Variables + pathlib
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-MODEL_PATH = os.getenv("MODEL_PATH", str(BASE_DIR / "models" / "mobilenetv3_quant.onnx"))
-LABELS_PATH = os.getenv("LABELS_PATH", str(BASE_DIR / "models" / "labels.json"))
+MODEL_PATH = os.getenv("MODEL_PATH", str(MODELS_DIR / "model.onnx"))
+LABELS_PATH = os.getenv("LABELS_PATH", str(MODELS_DIR / "labels.json"))
 THRESHOLD = float(os.getenv("MODEL_THRESHOLD", 0.7))
-
 
 app = FastAPI(
     title="Chiikawa Classification Service",
@@ -30,13 +31,33 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# 1. เชื่อมต่อโฟลเดอร์ static เพื่อให้เข้าถึงไฟล์ css/js ได้
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+# Startup Event - ตรวจสอบ Path ทั้งหมดก่อนเริ่มแอป
+@app.on_event("startup")
+async def startup_event():
+    print("\n" + "="*60)
+    print("🚀 [STARTUP] Chiikawa Classification Service")
+    print("="*60)
+    print(f"📁 BASE_DIR (src): {BASE_DIR}")
+    print(f"📁 ROOT_DIR: {ROOT_DIR}")
+    print(f"📁 STATIC_DIR: {STATIC_DIR} → {'✅' if STATIC_DIR.exists() else '❌'}")
+    print(f"📁 MODELS_DIR: {MODELS_DIR} → {'✅' if MODELS_DIR.exists() else '❌'}")
+    print(f"🤖 MODEL_PATH: {MODEL_PATH} → {'✅' if Path(MODEL_PATH).exists() else '❌'}")
+    print(f"📋 LABELS_PATH: {LABELS_PATH} → {'✅' if Path(LABELS_PATH).exists() else '❌'}")
+    print("="*60 + "\n")
+    
+    # เช็คว่าไฟล์สำคัญหายไปหรือเปล่า
+    if not Path(MODEL_PATH).exists():
+        print(f"⚠️  WARNING: Model file not found at {MODEL_PATH}")
+    if not Path(LABELS_PATH).exists():
+        print(f"⚠️  WARNING: Labels file not found at {LABELS_PATH}")
+
+# 1. เชื่อมต่อโฟลเดอร์ static เพื่อให้เข้าถึงไฟล์ css/js ได้ (ใช้ absolute path)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # 2. สร้าง Route สำหรับหน้าแรก (Frontend)
 @app.get("/")
 async def read_index():
-    return FileResponse("src/static/index.html")
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 # --- ส่วนจัดการ Traffic  ---
 # จำกัดให้ CPU Bound ได้พร้อมกันแค่ 4 งาน ใครที่มาเกินกว่านี้จะ Wait in Queue แทนการโดนไล่
@@ -61,12 +82,17 @@ def AI_inference_worker(image_bytes: bytes):
     if engine is None:
         # เช็คก่อนว่าไฟล์โมเดลมีอยู่จริงไหม (ข้อดีของ pathlib object)
         m_path = Path(MODEL_PATH)
+        l_path = Path(LABELS_PATH)
+        
         if not m_path.exists():
-            raise FileNotFoundError(f"หาไฟล์โมเดลไม่เจอที่: {m_path}")
+            raise FileNotFoundError(f"❌ หาไฟล์โมเดลไม่เจอที่: {m_path}")
+        
+        if not l_path.exists():
+            raise FileNotFoundError(f"❌ หาไฟล์ labels ไม่เจอที่: {l_path}")
             
         engine = ChiikawaModel(
             model_path=str(m_path), 
-            labels_path=LABELS_PATH,
+            labels_path=str(l_path),
             threshold=THRESHOLD
         )
     label, score = engine.predict(image_bytes)
@@ -77,8 +103,8 @@ def AI_inference_worker(image_bytes: bytes):
 def log_model_processing(filename: str):
     print(f"กำลังส่งไฟล์ {filename} เข้าสู่กระบวนการรันโมเดลใน Background...")
 
-@app.get("/", tags=['Health Check'])
-async def root():
+@app.get("/health", tags=['Health Check'])
+async def health():
     return {"status": "online", "message": "Chiikawa API is ready!"}
 
 @app.post("/predict", response_model=PredictionResponse, tags=["MLOps"])

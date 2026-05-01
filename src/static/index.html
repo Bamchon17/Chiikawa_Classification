@@ -5,55 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chiikawa Prediction</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1 class="main-title">CHIIKAWA <span>PREDICTION</span></h1>
-            <div class="subtitle">อัปโหลดรูป Chiikawa เพื่อทำนายตัวละคร</div>
-        </header>
+    <!-- ระบบแจ้งเตือนด้านบนหน้าจอ -->
+    <div id="status-toast" class="status-toast hidden">
+        <span id="status-icon">🍃</span>
+        <span id="status-message">กำลังเตรียมพร้อม...</span>
+    </div>
 
-        <main class="prediction-area">
-            <!-- ฝั่งซ้าย: อัปโหลดรูป -->
-            <section class="upload-section card">
-                <div id="drop-zone" class="drop-zone">
-                    <img src="/static/upload-icon.png" alt="Upload" class="icon">
-                    <p>Drag & drop your image here</p>
-                    <span>or click to choose image</span>
-                    <input type="file" id="file-input" hidden accept="image/*">
-                </div>
-                <div id="preview-container" class="hidden">
-                    <img id="image-preview" src="" alt="Preview">
-                    <button id="remove-btn" class="remove-btn">×</button>
-                </div>
-            </section>
+    <div class="main-container">
+        <div class="header-pill">
+            🍃 อัปโหลดรูป Chiikawa เพื่อทำนายตัวละคร 🍃
+        </div>
 
-            <!-- ฝั่งขวา: ผลลัพธ์ -->
-            <section class="results-section card">
-                <h3>Results</h3>
-                <div class="result-content">
-                    <div class="result-image-wrapper">
-                        <img id="result-display" src="/static/placeholder.png">
-                        <div id="bounding-box" class="bounding-box hidden"></div>
+        <div class="content-wrapper">
+            <!-- ฝั่งซ้าย: ส่วนอัปโหลด -->
+            <div class="white-box" id="drop-zone">
+                <div class="upload-inner" id="upload-text-group">
+                    <p class="text-drag">Drag & drop your image here</p>
+                    <div class="btn-choose">or click to choose image</div>
+                    <p class="text-format">Supported formats: JPG, PNG, WEBP (max 5 MB)</p>
+                </div>
+                <input type="file" id="file-input" hidden accept="image/*">
+                <img id="image-preview" class="display-img hidden">
+            </div>
+
+            <!-- ฝั่งขวา: ส่วนแสดงผลลัพธ์ -->
+            <div class="white-box" id="result-box">
+                <div class="results-title">Results</div>
+                
+                <!-- หน้าต่างรอประมวลผล (Loading Overlay) -->
+                <div id="loading-overlay" class="loading-overlay hidden">
+                    <div class="loader-content">
+                        <div class="bounce-emoji">⌛</div>
+                        <p id="loading-text">กำลังรอคิวประมวลผล...</p>
                     </div>
-                    <div class="prediction-details">
-                        <h4>Prediction Results</h4>
-                        <div id="winner-name" class="winner-name">-</div>
-                        <div class="confidence-bar-container">
-                            <p>Confidence Score</p>
-                            <div class="progress-bg">
-                                <div id="confidence-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+
+                <div class="results-layout" id="results-display">
+                    <div class="result-img-side">
+                        <img id="result-img" class="display-img hidden">
+                    </div>
+                    <div class="result-info-side">
+                        <p class="results-label">Prediction Results</p>
+                        <h2 id="char-name">-</h2>
+                        <div class="confidence-area">
+                            <p class="score-label">Confidence Score</p>
+                            <div class="progress-container">
+                                <div id="progress-fill" class="progress-bar"></div>
                             </div>
-                            <span id="confidence-text">0.00 / 1.00</span>
+                            <div class="score-text">
+                                <span id="conf-num">0.00</span> / 1.00
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
 
-        <footer>
-            <button id="predict-btn" class="btn-primary">Predict again ↻</button>
-        </footer>
+        <div class="footer-action">
+            <button id="predict-btn" class="main-btn">Predict again ↻</button>
+        </div>
     </div>
     <script src="/static/script.js"></script>
 </body>

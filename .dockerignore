@@ -1,0 +1,35 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ── Virtual environment  ──
+venv/
+.venv/
+env/
+
+# ── Dataset & Training  ──
+dataset/
+Validation_set/
+training/
+train/
+
+# ── Model Management ──
+# เก็บแค่ตัวที่จะใช้รันจริงไว้ (model.onnx และ labels.json)
+models/*.pth
+models/model_int8.onnx
+models/model_prep.onnx
+models/confusion_matrix.png
+models/training_curves.png
+models/model.onnx.data
+
+# ── IDE & OS ──
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── Secrets ──
+.env
+*.key

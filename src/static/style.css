@@ -1,51 +1,199 @@
 :root {
     --primary-green: #82CD47;
-    --hover-green: #54B435;
-    --card-bg: #F9F8F1;
-    --accent-pink: #FF9AA2;
-    --accent-yellow: #FFDAC1;
-    --text-main: #444444;
+    --dark-green: #4B7928;
+    --soft-pink: #FFB7CE; /* สีชมพูสำหรับขอบรูปผลลัพธ์ */
+    --bg-white: rgba(255, 255, 255, 0.9);
+    --text-main: #444; /* สีเทาเข้มเพื่อให้อ่านง่ายกว่าสีดำสนิท */
 }
 
 body {
-    background-image: url('/static/bg-garden.jpg'); /* ใส่รูปสวนในพื้นหลัง */
-    background-size: cover;
+    background-image: url('/static/images/web bg.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
     font-family: 'Kanit', sans-serif;
-    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
 }
 
-.card {
-    background-color: var(--card-bg);
-    border: 3px dashed #D1D1D1;
-    border-radius: 20px;
-    padding: 20px;
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    padding-top: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.btn-primary {
+/* 1. แก้ไข Header Pill ให้กว้างเท่ากลุ่มกล่องด้านล่าง (ประมาณ 1000px) */
+.header-pill {
+    background-color: white;
+    width: 1000px; 
+    padding: 15px 0;
+    border-radius: 50px;
+    color: var(--dark-green);
+    font-weight: 600;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 50px;
+    text-align: center;
+    z-index: 10;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.white-box {
+    background-color: var(--bg-white);
+    width: 480px;
+    height: 380px;
+    border-radius: 35px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 30px; /* เพิ่ม Padding ให้ดูโปร่งสะอาดตาแบบรูปที่ 2 */
+    box-sizing: border-box;
+    border: 3px dashed var(--primary-green);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* 2. ปรับแต่งส่วนอัปโหลดให้เหมือน image_c88cac.png */
+.upload-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+.text-drag { 
+    color: var(--text-main); 
+    font-size: 1.2rem; 
+    font-weight: 500;
+    margin-bottom: 15px; 
+}
+
+.btn-choose {
     background-color: var(--primary-green);
     color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 30px;
-    font-size: 1.2rem;
+    padding: 10px 35px;
+    border-radius: 30px; /* มนสวยตามแบบ */
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
+    border: none;
+    transition: transform 0.2s, filter 0.2s;
+    display: inline-block;
 }
 
-.btn-primary:hover {
-    background-color: var(--hover-green);
+.btn-choose:hover {
     transform: scale(1.05);
+    filter: brightness(1.05);
 }
 
-.progress-bg {
-    background: #E5E5E5;
-    border-radius: 10px;
-    height: 12px;
-    overflow: hidden;
+.text-format { 
+    color: #aaa; 
+    font-size: 0.85rem; 
+    margin-top: 20px; 
 }
 
-.progress-fill {
-    background: var(--primary-green);
+/* 3. ปรับปรุงส่วน Results ให้สวยงามและมี Stroke ชมพู */
+.results-title {
+    color: var(--dark-green);
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 25px;
+    left: 30px;
+}
+
+.results-layout {
+    display: flex;
+    width: 100%;
     height: 100%;
-    transition: width 0.5s ease-in-out;
+    align-items: center;
+    gap: 25px;
+    padding-top: 30px;
 }
+
+.result-img-side {
+    width: 190px;
+    height: 190px;
+    background: white;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Stroke สีชมพูตามสั่ง */
+    border: 5px solid var(--soft-pink);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(255, 183, 206, 0.2);
+}
+
+.result-info-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.results-label { color: #999; font-size: 0.9rem; margin-bottom: 4px; font-weight: 300; }
+
+#char-name { 
+    color: var(--text-main); 
+    font-size: 2.2rem; /* ขยายขนาดให้อ่านง่ายเป็น Priority 1 */
+    margin: 0 0 15px 0; 
+    font-weight: 600; 
+}
+
+.score-label { color: #666; font-size: 0.95rem; margin-bottom: 8px; font-weight: 500; }
+
+.progress-container {
+    width: 100%;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary-green);
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.score-text {
+    font-weight: 600;
+    color: var(--dark-green);
+}
+
+/* UI อื่นๆ */
+.status-toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: white; padding: 12px 25px; border-radius: 50px;
+    border: 2px solid var(--primary-green); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 1000; display: flex; align-items: center; gap: 10px;
+    animation: slideDown 0.4s ease-out;
+}
+.toast-error { border-color: #ff8b8b; color: #d63031; }
+.loading-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.85); z-index: 20;
+    display: flex; justify-content: center; align-items: center;
+    border-radius: 32px; backdrop-filter: blur(2px);
+}
+.display-img { width: 100%; height: 100%; object-fit: contain; }
+.main-btn { background-color: var(--primary-green); color: white; border: 2.5px solid white; padding: 12px 60px; border-radius: 35px; cursor: pointer; margin-top: 40px; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s; }
+.main-btn:hover { background-color: var(--dark-green); transform: translateY(-2px); }
+.hidden { display: none !important; }
+@keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }

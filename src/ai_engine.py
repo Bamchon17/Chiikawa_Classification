@@ -18,57 +18,40 @@ class ChiikawaModel:
             self.classes = json.load(f)
             
         self.threshold = threshold
+        # ค่า MEAN และ STD ตามที่เพื่อนใช้เทรน (สำคัญมาก!)
+        self.MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+        self.STD  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+        
         print(f"--- [INIT] Model Loaded: {model_path} ---")
-        print(f"--- [INIT] Labels: {self.classes} (Total: {len(self.classes)}) ---")
-        print(f"--- [INIT] Current Threshold: {self.threshold} ---")
+        print(f"--- [INIT] Labels: {self.classes} ---")
 
-    def _softmax(self, x):
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum()
-    
     def predict(self, image_bytes: bytes):
         try:
-            print("\n" + "="*50)
-            print("🔍 DEBUG: Start Prediction Process")
-            
             # --- PRE-PROCESSING ---
-            img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-            img = img.resize((224, 224)) 
+            img = Image.open(io.BytesIO(image_bytes)).convert('RGB').resize((224, 224))
+            arr = np.array(img, dtype=np.float32) / 255.0
             
-            img_array = np.array(img).astype(np.float32) / 255.0
-            
-            # Debug Pixel Range: เช็คว่า ToTensor ทำงานถูกไหม
-            print(f"DEBUG: Image Scale Min: {img_array.min():.4f}, Max: {img_array.max():.4f}")
-            
-            img_array = img_array.transpose(2, 0, 1)
-            img_array = np.expand_dims(img_array, axis=0)
+            # ทำ Normalization ให้ตรงกับที่เพื่อนเทรน
+            arr = (arr - self.MEAN) / self.STD
+            arr = arr.transpose(2, 0, 1)[np.newaxis]  # NCHW
 
             # --- INFERENCE ---
-            input_name = self.session.get_inputs()[0].name
-            raw_outputs = self.session.run(None, {input_name: img_array})
-            
+            # ใช้ชื่อ input ว่า "input" ตามโค้ดที่เพื่อนใช้
+            raw_outputs = self.session.run(None, {"input": arr})
             logits = np.squeeze(raw_outputs[0]) 
-            print(f"DEBUG: Raw Logits (Top 5): {logits[:5]}") # ดูค่าดิบก่อนเข้า Softmax
 
             # --- POST-PROCESSING ---
-            probabilities = self._softmax(logits)
-            idx = np.argmax(probabilities)
-            conf_score = float(probabilities[idx])
+            probs = np.exp(logits) / np.exp(logits).sum()
+            idx = probs.argmax()
+            conf_score = float(probs[idx])
+            label = self.classes[idx]
 
-            # Debug ผลลัพธ์ทั้งหมด
-            print(f"DEBUG: All Probabilities: {['{:.4f}'.format(p) for p in probabilities]}")
-            print(f"DEBUG: Winner Index: {idx} ({self.classes[idx]})")
-            print(f"DEBUG: Confidence Score: {conf_score:.4f}")
-
-            # --- LOGIC: THRESHOLD CHECK ---
+            # --- THRESHOLD CHECK ---
             if conf_score < self.threshold:
-                print(f"⚠️ RESULT: Unknown (Reason: {conf_score:.4f} < {self.threshold})")
-                # ส่งค่ากลับไปพร้อมระบุว่าจริงๆ แล้วมันคือตัวอะไรแต่ Confidence ไม่ถึง
-                return f"Unknown (Maybe {self.classes[idx]}?)", conf_score
+                return f"Unknown (Maybe {label}?)", conf_score
             
-            print(f"✅ RESULT: Prediction Success -> {self.classes[idx]}")
-            return self.classes[idx], conf_score
+            return label, conf_score
 
         except Exception as e:
-            print(f"❌ ERROR: Prediction Failed -> {str(e)}")
+            print(f"❌ ERROR: {str(e)}")
             return "Error", 0.0

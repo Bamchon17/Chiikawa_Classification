@@ -16,9 +16,11 @@ env/
 
 # ── Dataset (binary / large files) ───────────────────────────────────────────
 dataset/
+Validation_set/
+training/
 
 # ── Model checkpoints ─────────────────────────────────────────────────────────
-checkpoints/
+/checkpoints
 
 # ── Jupyter ───────────────────────────────────────────────────────────────────
 .ipynb_checkpoints/
@@ -41,3 +43,4 @@ desktop.ini
 
 # ── Claude ──────────────────────────────────────────────────────────
 .Claude
+

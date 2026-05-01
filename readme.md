@@ -91,10 +91,49 @@ git lfs pull
 ```text
 .
 ├── src/                # FastAPI Application source code
+│   └── main.py             # FastAPI entry point
+├── train/              # Training pipeline
+│   ├── dataset.py          # Dataset loader & augmentation
+│   ├── engine.py           # Train/validation loop
+│   ├── evaluate.py         # Evaluation & metrics
+│   ├── train.py            # Training entry point
+│   └── utils/              # Shared utilities
+│       ├── transforms.py   # Image transforms
+│       ├── preprocess.py   # Image preprocessing
+│       ├── metrics.py      # Evaluation metrics
+│       ├── visualization.py# Plotting & visualization
+│       ├── data_prepare.py # Dataset preparation helpers
+│       └── seed.py         # Reproducibility seed
 ├── models/             # Exported ONNX & Quantized models
+│   ├── best_model.pth      # PyTorch checkpoint (training output)
+│   ├── model.onnx          # ONNX FP32 (exported)
+│   ├── model_prep.onnx     # ONNX pre-processed (quantization intermediate)
+│   ├── model_int8.onnx     # ONNX INT8 Quantized (production)
+│   ├── labels.json         # Class label mapping
+│   ├── training_curves.png # Loss & accuracy curves (training artifact)
+│   └── confusion_matrix.png# Confusion matrix (testing artifact)
 ├── tests/              # Pytest unit tests
 ├── .github/workflows/  # CI/CD configuration (GitHub Actions)
 ├── performance/        # JMeter scripts and Load test results
 ├── Dockerfile          # Container configuration
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation
+```
+
+---
+
+## 🤖 Model Artifacts
+
+โมเดลผ่าน pipeline ครบทุกขั้นตอน ผลลัพธ์ทั้งหมดอยู่ใน `models/`
+
+| File | Description |
+|---|---|
+| `best_model.pth` | PyTorch checkpoint (ต้นทาง, ใช้สำหรับ export) |
+| `model.onnx` | ONNX FP32 (export จาก PyTorch) |
+| `model_prep.onnx` | ONNX ที่ผ่าน `quant_pre_process` (intermediate step ก่อน quantize) |
+| `model_int8.onnx` | ONNX Dynamic INT8 Quantized (ใช้งานใน production) |
+
+**Training pipeline:**
+```
+Train → Export (ONNX FP32) → Pre-process → Quantize (INT8) → Deploy
+```

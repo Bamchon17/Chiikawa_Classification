@@ -1,0 +1,17 @@
+# API Part
+fastapi
+uvicorn
+python-multipart # สำหรับการอ่านข้อมูลรูป multipart/form-data
+pillow
+pydantic
+
+# Core Model
+onnxruntime
+numpy
+opencv-python
+transformers
+huggingface-hub
+
+# CI/CD
+pytest
+httpx

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiikawa Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="main-title">CHIIKAWA <span>PREDICTION</span></h1>
+            <div class="subtitle">อัปโหลดรูป Chiikawa เพื่อทำนายตัวละคร</div>
+        </header>
+
+        <main class="prediction-area">
+            <!-- ฝั่งซ้าย: อัปโหลดรูป -->
+            <section class="upload-section card">
+                <div id="drop-zone" class="drop-zone">
+                    <img src="/static/upload-icon.png" alt="Upload" class="icon">
+                    <p>Drag & drop your image here</p>
+                    <span>or click to choose image</span>
+                    <input type="file" id="file-input" hidden accept="image/*">
+                </div>
+                <div id="preview-container" class="hidden">
+                    <img id="image-preview" src="" alt="Preview">
+                    <button id="remove-btn" class="remove-btn">×</button>
+                </div>
+            </section>
+
+            <!-- ฝั่งขวา: ผลลัพธ์ -->
+            <section class="results-section card">
+                <h3>Results</h3>
+                <div class="result-content">
+                    <div class="result-image-wrapper">
+                        <img id="result-display" src="/static/placeholder.png">
+                        <div id="bounding-box" class="bounding-box hidden"></div>
+                    </div>
+                    <div class="prediction-details">
+                        <h4>Prediction Results</h4>
+                        <div id="winner-name" class="winner-name">-</div>
+                        <div class="confidence-bar-container">
+                            <p>Confidence Score</p>
+                            <div class="progress-bg">
+                                <div id="confidence-fill" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="confidence-text">0.00 / 1.00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <button id="predict-btn" class="btn-primary">Predict again ↻</button>
+        </footer>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

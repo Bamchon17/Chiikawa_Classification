@@ -36,6 +36,26 @@ jobs:
       - name: Run tests
         run: pytest -v
 
+      - name: Validate Hugging Face credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ secrets.HF_SPACE_ID }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ["HF_TOKEN"]
+          space_id = os.environ["HF_SPACE_ID"]
+
+          api = HfApi(token=token)
+          user = api.whoami()
+          print(f"Authenticated as: {user['name']}")
+          api.repo_info(repo_id=space_id, repo_type="space")
+          print(f"Can access Hugging Face Space: {space_id}")
+          PY
+
       - name: Deploy to Hugging Face Space
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:

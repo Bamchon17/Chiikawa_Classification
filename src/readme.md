@@ -51,3 +51,13 @@ Memory Management: มีการจัดการ Pre-processing (Resize/Norm
 ```bash
 pip install -r requirements.txt
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+---
+title: Chiikawa-classification
+emoji: 🐱
+colorFrom: pink
+colorTo: yellow
+sdk: docker
+app_port: 7860
+---

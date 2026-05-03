@@ -37,7 +37,7 @@ COPY models/labels.json ./models/
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8000
+EXPOSE 7860
 
 # รัน Server โดยชี้ไปที่ main.py ในโฟลเดอร์ src
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-7860}"]

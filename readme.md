@@ -2,7 +2,14 @@
   <img src="assets/images/ChiikawaBanner.jpeg" width="100%" alt="Project Banner">
 </p>
 
-
+ ---
+title: Chiikawa-classification 
+emoji: 🐱
+colorFrom: pink
+colorTo: yellow
+sdk: docker
+app_port: 7860
+---
 
 # 🐹 Chiikawa Image Classification Service (MLOps Challenge)
 
@@ -126,3 +133,36 @@ git lfs pull
 ```
 Train → Export (ONNX FP32) → Pre-process → Quantize (INT8) → Deploy
 ```
+---
+
+## Deploy to Hugging Face Space
+
+โปรเจกต์นี้ deploy เป็น Hugging Face Space แบบ Docker โดยแอปจะรันที่ port `7860`
+
+ตั้งค่า metadata ของ Hugging Face Space ดังนี้:
+
+```yaml
+---
+title: Chiikawa-classification
+emoji: 🐱
+colorFrom: pink
+colorTo: yellow
+sdk: docker
+app_port: 7860
+---
+```
+
+ระบบ deploy ใช้ GitHub Actions จากไฟล์ `.github/workflows/deploy-hf.yml` โดยต้องเพิ่ม repository secrets ใน GitHub ก่อน:
+
+| Secret | Description |
+|---|---|
+| `HF_TOKEN` | Hugging Face access token ที่มีสิทธิ์เขียน/อัปโหลดไปยัง Space |
+| `HF_SPACE_ID` | repo ID ของ Hugging Face Space เช่น `username/Chiikawa-classification` |
+
+ขั้นตอนการ deploy:
+
+1. Push code เข้า branch `main`
+2. GitHub Actions checkout repo พร้อม Git LFS
+3. ติดตั้ง Python dependencies จาก `requirements.txt`
+4. รัน `pytest -v`
+5. ถ้า test ผ่าน จะ upload โปรเจกต์ไปยัง Hugging Face Space อัตโนมัติ

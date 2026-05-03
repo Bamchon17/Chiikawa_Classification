@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from ..utils.metrics import confusion_matrix, classification_report
-from ..utils.visualization import plot_confusion_matrix
+from .utils.metrics import confusion_matrix, classification_report
+from .utils.visualization import plot_confusion_matrix
 
 
 def evaluate(

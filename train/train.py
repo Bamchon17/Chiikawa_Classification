@@ -9,8 +9,8 @@ from torchvision import models
 from .dataset import get_dataloaders
 from .engine import train_one_epoch, validate
 from .evaluate import evaluate
-from ..utils.seed import set_seed
-from ..utils.visualization import plot_training_curves
+from .utils.seed import set_seed
+from .utils.visualization import plot_training_curves
 
 # ── Config ────────────────────────────────────────────────────────────────────
 TRAIN_DIR     = Path("dataset/training")

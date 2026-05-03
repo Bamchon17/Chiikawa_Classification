@@ -87,61 +87,26 @@ git lfs pull
 
 ---
 
-## 📁 Directory Structure
+## 📁 Directory Structure (Proposed)
 ```text
 .
-├── src/                        # FastAPI Application source code
-│   ├── main.py                 # FastAPI entry point
-│   ├── ai_engine.py            # ONNX inference engine
-│   └── static/                 # Frontend files
-│       ├── index.html
-│       ├── script.js
-│       └── style.css
-├── train/                      # Training pipeline
-│   ├── dataset.py              # Dataset loader & augmentation
-│   ├── engine.py               # Train/validation loop
-│   ├── evaluate.py             # Evaluation & metrics
-│   ├── train.py                # Training entry point
-│   └── utils/                  # Shared utilities
-│       ├── transforms.py
-│       ├── preprocess.py
-│       ├── metrics.py
-│       ├── visualization.py
-│       ├── data_prepare.py
-│       └── seed.py
-├── models/                     # Exported ONNX & Quantized models
-│   ├── best_model.pth          # PyTorch checkpoint (training output)
-│   ├── model.onnx              # ONNX FP32 (exported)
-│   ├── model_prep.onnx         # ONNX pre-processed (quantization intermediate)
-│   ├── model_int8.onnx         # ONNX INT8 Quantized (production)
-│   ├── labels.json             # Class label mapping
-│   ├── training_curves.png     # Loss & accuracy curves (training artifact)
-│   └── confusion_matrix.png    # Confusion matrix (testing artifact)
-├── dataset/                    # Image dataset (tracked via Git LFS)
-│   ├── Data/                   # Raw dataset
-│   │   ├── Chiikawa/
-│   │   ├── Hachiware/
-│   │   ├── Usagi/
-│   │   └── multi_character/
-│   └── dataset_split/          # Train/val split
-│       ├── train/
-│       │   ├── Chiikawa/
-│       │   ├── Hachiware/
-│       │   └── Usagi/
-│       └── val/
-│           ├── Chiikawa/
-│           ├── Hachiware/
-│           └── Usagi/
-├── model testing/              # Model export & testing scripts
-│   ├── run_export.py
-│   ├── run_test.py
-│   └── scan_dataset.py
-├── tests/                      # Pytest unit tests
-├── .github/workflows/          # CI/CD configuration (GitHub Actions)
-├── performance/                # JMeter scripts and Load test results
-├── Dockerfile                  # Container configuration
-├── requirements.txt            # Python dependencies
-└── README.md                   # Project documentation
+├── src/                # FastAPI Application source code
+├── train/              # Training pipeline
+│   └── utils/              # Shared utilities
+├── models/             # Exported ONNX & Quantized models
+│   ├── best_model.pth      # PyTorch checkpoint (training output)
+│   ├── model.onnx          # ONNX FP32 (exported)
+│   ├── model_prep.onnx     # ONNX pre-processed (quantization intermediate)
+│   ├── model_int8.onnx     # ONNX INT8 Quantized (production)
+│   ├── labels.json         # Class label mapping
+│   ├── training_curves.png # Loss & accuracy curves (training artifact)
+│   └── confusion_matrix.png# Confusion matrix (testing artifact)
+├── tests/              # Pytest unit tests
+├── .github/workflows/  # CI/CD configuration (GitHub Actions)
+├── performance/        # JMeter scripts and Load test results
+├── Dockerfile          # Container configuration
+├── requirements.txt    # Python dependencies
+└── README.md           # Project documentation
 ```
 
 ---

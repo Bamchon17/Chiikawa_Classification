@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 
-from ..utils.transforms import train_transform, val_transform
+from .utils.transforms import train_transform, val_transform
 
 _PIN = torch.cuda.is_available()
 

@@ -166,3 +166,63 @@ app_port: 7860
 3. ติดตั้ง Python dependencies จาก `requirements.txt`
 4. รัน `pytest -v`
 5. ถ้า test ผ่าน จะ upload โปรเจกต์ไปยัง Hugging Face Space อัตโนมัติ
+
+---
+
+## API Testing Artifacts
+
+### Postman Collection
+
+The Postman collection is available at:
+
+```text
+postman/Chiikawa_API.postman_collection.json
+```
+
+It contains requests for both environments:
+
+| Environment | Base URL |
+|---|---|
+| Local Docker | `http://127.0.0.1:8000` |
+| Hugging Face Space | `https://CocoLune-Chiikawa-classification.hf.space` |
+
+Import the collection into Postman, then use the `Predict Image` request. The request body uses `form-data` with a file field named `file`.
+
+### cURL Commands
+
+Health check on Local Docker:
+
+```powershell
+curl.exe http://127.0.0.1:8000/health
+```
+
+Predict on Local Docker:
+
+```powershell
+curl.exe -X POST "http://127.0.0.1:8000/predict" `
+  -F "file=@performance/test_images/Usagi-jumping.jpg;type=image/jpeg"
+```
+
+Health check on Hugging Face Space:
+
+```powershell
+curl.exe https://CocoLune-Chiikawa-classification.hf.space/health
+```
+
+Predict on Hugging Face Space:
+
+```powershell
+curl.exe -X POST "https://CocoLune-Chiikawa-classification.hf.space/predict" `
+  -F "file=@performance/test_images/Usagi-jumping.jpg;type=image/jpeg"
+```
+
+Expected `/predict` response:
+
+```json
+{
+  "filename": "Usagi-jumping.jpg",
+  "prediction": "usagi",
+  "confidence": 0.98,
+  "message": "..."
+}
+```

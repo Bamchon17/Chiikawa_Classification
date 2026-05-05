@@ -1,0 +1,135 @@
+{
+  "info": {
+    "_postman_id": "7ddc93d7-f2f3-4b4b-8f8f-chiikawa-api",
+    "name": "Chiikawa Classification API",
+    "description": "Postman collection for testing the Chiikawa image classification API on local Docker and Hugging Face Space.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "local_base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "cloud_base_url",
+      "value": "https://CocoLune-Chiikawa-classification.hf.space",
+      "type": "string"
+    },
+    {
+      "key": "image_path",
+      "value": "C:/Users/ramid/Documents/Chiikawa_Classification/performance/test_images/Usagi-jumping.jpg",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Local Docker",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{local_base_url}}/health"
+          },
+          "response": []
+        },
+        {
+          "name": "Predict Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{image_path}}"
+                }
+              ]
+            },
+            "url": "{{local_base_url}}/predict",
+            "description": "Upload a real image file to the local Docker API. Start Docker with: docker run --rm -p 8000:7860 chiikawa-classifier"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cloud Hugging Face",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{cloud_base_url}}/health"
+          },
+          "response": []
+        },
+        {
+          "name": "Predict Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{image_path}}"
+                }
+              ]
+            },
+            "url": "{{cloud_base_url}}/predict",
+            "description": "Upload a real image file to the Hugging Face Space API."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Validation Examples",
+      "item": [
+        {
+          "name": "Reject Non-Image File Type - Local",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "text",
+                  "value": "not an image"
+                }
+              ]
+            },
+            "url": "{{local_base_url}}/predict",
+            "description": "Expected result: 400 or 422 depending on how Postman sends the multipart part."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

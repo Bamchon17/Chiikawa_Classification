@@ -111,6 +111,7 @@ git lfs pull
 ├── tests/              # Pytest unit tests
 ├── .github/workflows/  # CI/CD configuration (GitHub Actions)
 ├── performance/        # JMeter scripts and Load test results
+├── postman/            # Postman collection for Local and Cloud API testing
 ├── Dockerfile          # Container configuration
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation
@@ -169,54 +170,54 @@ app_port: 7860
 
 ---
 
-## API Testing Artifacts
+## เอกสารและไฟล์สำหรับทดสอบ API
 
 ### Postman Collection
 
-The Postman collection is available at:
+ไฟล์ Postman Collection อยู่ที่:
 
 ```text
 postman/Chiikawa_API.postman_collection.json
 ```
 
-It contains requests for both environments:
+ภายใน collection มี request สำหรับทดสอบทั้ง 2 environment:
 
 | Environment | Base URL |
 |---|---|
 | Local Docker | `http://127.0.0.1:8000` |
 | Hugging Face Space | `https://CocoLune-Chiikawa-classification.hf.space` |
 
-Import the collection into Postman, then use the `Predict Image` request. The request body uses `form-data` with a file field named `file`.
+วิธีใช้งานคือ import ไฟล์นี้เข้า Postman แล้วเลือก request ชื่อ `Predict Image` จากฝั่ง Local Docker หรือ Hugging Face Space ตามที่ต้องการ โดย request body ตั้งค่าเป็น `form-data` และมี field สำหรับอัปโหลดไฟล์ชื่อ `file`
 
 ### cURL Commands
 
-Health check on Local Docker:
+ตรวจสอบสถานะ API บน Local Docker:
 
 ```powershell
 curl.exe http://127.0.0.1:8000/health
 ```
 
-Predict on Local Docker:
+เรียก `/predict` บน Local Docker พร้อมส่งไฟล์ภาพจริง:
 
 ```powershell
 curl.exe -X POST "http://127.0.0.1:8000/predict" `
   -F "file=@performance/test_images/Usagi-jumping.jpg;type=image/jpeg"
 ```
 
-Health check on Hugging Face Space:
+ตรวจสอบสถานะ API บน Hugging Face Space:
 
 ```powershell
 curl.exe https://CocoLune-Chiikawa-classification.hf.space/health
 ```
 
-Predict on Hugging Face Space:
+เรียก `/predict` บน Hugging Face Space พร้อมส่งไฟล์ภาพจริง:
 
 ```powershell
 curl.exe -X POST "https://CocoLune-Chiikawa-classification.hf.space/predict" `
   -F "file=@performance/test_images/Usagi-jumping.jpg;type=image/jpeg"
 ```
 
-Expected `/predict` response:
+ตัวอย่าง response ที่คาดว่าจะได้จาก `/predict`:
 
 ```json
 {
